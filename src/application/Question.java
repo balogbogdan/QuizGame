@@ -3,10 +3,15 @@ package application;
 // This class handles questions and all their information
 // All questions are instances of this class
 
-
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,15 +23,19 @@ public class Question {
 
     // static variables (available to any instance)
     static Random rand = new Random();
-    public static int score = 0;
-    public static int questionCount = 1;
-    public static int questionIndex = 0;
-    public static int questionsCorrect = 0;
+    static int score = 0;
+    static int questionCount = 1;
+    static int questionIndex = 0;
+    static int questionsCorrect = 0;
+    static ArrayList<Button> buttons;
+    final static String DELIMITER = ";";
 
     // instance specific variables
     String question;
     String correct;
     ArrayList<String> wrongs;
+    Button randButton;
+
 
     // Constructor; creates "wrongs" ArrayList which stores the wrong/decoy answers
     public Question(String question, String correct, String wrong1, String wrong2, String wrong3) {
@@ -38,46 +47,111 @@ public class Question {
         this.wrongs.add(wrong3);
     }
 
-    // Creates 10 sample FOSS questions to test on
-    public static ArrayList<Question> sampleQuestions() {
+
+    // Loads questions from a file and returns an ArrayList of Question objects
+    public static ArrayList<Question> loadQuestions(String filename) {
         ArrayList<Question> questions = new ArrayList<>();
-        questions.add(new Question("When was Linux made?", "1991", "2005", "1955", "1999"));
-        questions.add(new Question("Which web server has the largest web share?", "Apache", "Nginx", "IIS", "Facebook"));
+
+        try {
+            Path filePath = Paths.get("./" + filename);
+            // Reads lines from file
+            Files.lines(filePath).forEach(line -> {
+                if (line.startsWith("//") || line.isEmpty()) { // Ignores lines starting with '//' (comments)
+                    return;
+                }
+                String[] tokens = line.split(DELIMITER); // Splits line into array using delimiter
+                // Adds Question object to ArrayList using split line and trims of excessive spaces
+                questions.add(new Question(tokens[0].trim(), tokens[1].trim(), tokens[2].trim(), tokens[3].trim(), tokens[4].trim()));
+            });
+        } catch (IOException e) {
+            // Displays an alert about question file not found
+            Alert notFound = new Alert(Alert.AlertType.ERROR);
+            notFound.setTitle("Questions File Error");
+            notFound.setHeaderText("Questions file not found!");
+            notFound.setContentText("Make sure there is a questions.txt file in the same directory.");
+            notFound.getDialogPane().getStylesheets().add(Question.class.getResource("lightTheme.css").toExternalForm());
+            notFound.showAndWait();
+            // Exits
+            Platform.exit();
+            System.exit(0);
+        }
+
+        // Checks to make sure there are actually questions in the ArrayList; otherwise alerts and exits
+        if (questions.isEmpty()) {
+            Alert emptyQuestion = new Alert(Alert.AlertType.WARNING);
+            emptyQuestion.setTitle("No Questions found");
+            emptyQuestion.setHeaderText("No Questions were found in " + filename);
+            emptyQuestion.setContentText("Make sure there are questions in " + filename + ".");
+            emptyQuestion.getDialogPane().getStylesheets().add(Question.class.getResource("lightTheme.css").toExternalForm());
+            emptyQuestion.showAndWait();
+
+            Platform.exit();
+            System.exit(0);
+        }
         return questions;
     }
 
-    // Takes input of label and buttons and displays the instance question and answers in the GUI
-    public void displayQuestion(Label lbl, Button... buttonsArray) {
 
-        ArrayList<Button> buttons = new ArrayList<>(Arrays.asList(buttonsArray));
+    // Groups the 4 buttons in an ArrayList for easy access
+    public static void setButtons(Button...buttonsArray) {
+        buttons = new ArrayList<>(Arrays.asList(buttonsArray));
+    }
+
+
+    // questionIndex getter
+    public static int getQuestionIndex() { return questionIndex; }
+
+
+    // Takes input of label and buttons and displays the instance question and answers in the GUI
+    public void displayQuestion(Label lbl, Label correctLabel) {
+
+        //ArrayList<Button> buttons = new ArrayList<>(Arrays.asList(buttonArray));
+
+        ArrayList<Button> buttonsCopy = new ArrayList<>(buttons);
+
+
+        for (Button b : buttonsCopy) {
+            // Sets default style class for all buttons
+            b.getStyleClass().remove("correct");
+            b.getStyleClass().remove("wrong");
+        }
 
         // Sets question label to instance variable "question"
         lbl.setText(this.question);
+        correctLabel.setText("Question " + questionCount);
 
         // Generates random integer from 0 to 3
-        int randButton = rand.nextInt(4);
+        int randInt = rand.nextInt(4);
+        randButton = buttonsCopy.get(randInt);
 
         // Sets correct button to correct answer
-        buttons.get(randButton).setText(this.correct);
-        buttons.remove(randButton);
+        buttonsCopy.get(randInt).setText(this.correct);
+        buttonsCopy.remove(randInt);
         // The correct button is removed so it is easier to set other buttons to wrong answers without checking
         // whether it is the right answer button or not
 
         // shuffles "wrongs" ArrayList so buttons aren't in predictable order
         Collections.shuffle(this.wrongs);
-        for (Button b : buttons) {
+        for (Button b : buttonsCopy) {
             // Sets button to wrong of the same index (not a problem due to the shuffle)
-            b.setText(this.wrongs.get(buttons.indexOf(b)));
+            b.setText(this.wrongs.get(buttonsCopy.indexOf(b)));
         }
     }
 
+
     // Checks whether the clicked button is the correct answer or not
-    public void checkCorrect(Button b, ArrayList<Question> questions, Label scoreLabel, Label correctLabel) {
+    public void checkCorrect(Button b, ArrayList<Question> questions, Label scoreLabel) {
+
+        // Checks if the button clicked in correct
         // If correct, increments "score" and "questionsCorrect" and changes Score label
-        if (this.correct.equals(b.getText())) {
+        if (this.randButton == b) {
+            b.getStyleClass().add("correct"); // Makes button green
             score += 10;
             scoreLabel.setText("Score: " + score);
             questionsCorrect += 1;
+        } else {
+            b.getStyleClass().add("wrong"); // Makes button red
+            this.randButton.getStyleClass().add("correct");
         }
 
         // Checks if all questions have ben used; if yes, calls "finished" to show score and exit
@@ -88,7 +162,6 @@ public class Question {
         // Increments "questionCount" and "questionIndex" to keep track of the current question
         // Changes current question label
         questionCount += 1;
-        correctLabel.setText("Question " + questionCount);
         questionIndex += 1;
     }
 }

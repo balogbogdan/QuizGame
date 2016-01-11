@@ -4,13 +4,16 @@ package application;
 // Contains all event handlers
 
 
-import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class Controller {
@@ -38,65 +41,70 @@ public class Controller {
     private Label scoreLabel;
 
     // variables
-    public static ArrayList<Question> questions;
-    static double percent;
+    static ArrayList<Question> questions;
+    static int percent;
+    static int pauseValue = 1500;
 
 
     @FXML
     void initialize() {  // This gets run once to initialize the event handlers and such
 
-        // Creates 10 samples questions
-        questions = Question.sampleQuestions();
+        // Loads questions from 'questions.txt'
+        questions = Question.loadQuestions("questions.txt");
 
-        // Checks to make sure there are actually questions in the ArrayList; otherwise alerts and exits
-        if (questions.isEmpty()) {
-            new Alert(Alert.AlertType.ERROR, "There are no questions!").showAndWait();
-            Platform.exit();
-            System.exit(0);
-        }
+        Question.setButtons(button1, button2, button3, button4);
 
         // Displays the first question in the GUI
-        questions.get(Question.questionIndex).displayQuestion(questionLabel, button1, button2, button3, button4);
+            questions.get(Question.getQuestionIndex()).displayQuestion(questionLabel, questionNum);
 
-        // Event handler for the first button using lambda
-        button1.setOnAction((event) -> {
-            // Checks to see if user pressed the correct button; changes score
-            // Also checks if all questions exhausted; exits if yes
-            questions.get(Question.questionIndex).checkCorrect(button1, questions, scoreLabel, questionNum);
-            // Displays next question
-            questions.get(Question.questionIndex).displayQuestion(questionLabel, button1, button2, button3, button4);
-        });
-
-        // Event handler for the second button using lambda
-        button2.setOnAction((event) -> {
-            questions.get(Question.questionIndex).checkCorrect(button2, questions, scoreLabel, questionNum);
-            questions.get(Question.questionIndex).displayQuestion(questionLabel, button1, button2, button3, button4);
-        });
-
-        // Event handler for the third button using lambda
-        button3.setOnAction((event) -> {
-            questions.get(Question.questionIndex).checkCorrect(button3, questions, scoreLabel, questionNum);
-            questions.get(Question.questionIndex).displayQuestion(questionLabel, button1, button2, button3, button4);
-        });
-
-        // Event handler for the fourth button using lambda
-        button4.setOnAction((event) -> {
-            questions.get(Question.questionIndex).checkCorrect(button4, questions, scoreLabel, questionNum);
-            questions.get(Question.questionIndex).displayQuestion(questionLabel, button1, button2, button3, button4);
-        });
+        // Event handlers for the buttons calls method
+        button1.setOnAction(this::handleButtonAction);
+        button2.setOnAction(this::handleButtonAction);
+        button3.setOnAction(this::handleButtonAction);
+        button4.setOnAction(this::handleButtonAction);
     }
+
+
+    // Called when a button is clicked
+    private void handleButtonAction(ActionEvent event) {
+
+        button1.setDisable(true);
+        button2.setDisable(true);
+        button3.setDisable(true);
+        button4.setDisable(true);
+
+        // Checks to see if user pressed the correct button; changes score
+        // Also checks if all questions exhausted; exits if yes
+        // Uses getTarget() to get the button that was clicked
+        questions.get(Question.getQuestionIndex()).checkCorrect((Button) event.getTarget(), questions, scoreLabel);
+
+        // This ia needed to pause inbetween questions without stopping the UI thread
+        Timer time = new Timer();
+        time.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> {
+                    // Displays next question
+                    questions.get(Question.getQuestionIndex()).displayQuestion(questionLabel, questionNum);
+                    button1.setDisable(false);
+                    button2.setDisable(false);
+                    button3.setDisable(false);
+                    button4.setDisable(false);
+                }); } }, pauseValue); }
+
 
     // This method is run when all questions have been answered and displays score
     public static void finished(int score, int questionsCorrect) {
         // Calculates percent value
         if (questionsCorrect == 0) { percent = 0; }
-        else { percent = (double)questionsCorrect/(double)questions.size() * 100; }
+        else { percent = (int) ((double)questionsCorrect/(double)questions.size() * 100); }
 
         // Creates alert; tells score and questions correct
         Alert finish = new Alert(Alert.AlertType.INFORMATION);
         finish.setTitle("You Win!");
-        finish.setHeaderText("Score: " + score + " (" + percent + "%)");
-        finish.setContentText("Questions Correct: " + questionsCorrect);
+        finish.setHeaderText("Score: " + score);
+        finish.setContentText("Questions Correct: " + questionsCorrect + " out of " + questions.size() + " (" + percent + "%)");
+        finish.getDialogPane().getStylesheets().add(Question.class.getResource("lightTheme.css").toExternalForm());
         finish.showAndWait();
 
         // Exits

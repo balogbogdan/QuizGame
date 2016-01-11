@@ -1,3 +1,7 @@
+// Made by:
+// Gunvir Ranu
+// g1ranu@gmail.com
+
 package application;
 
 import javafx.application.Application;
@@ -14,7 +18,8 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
+
         // This loads the FXML files for the GUI
         Parent root = FXMLLoader.load(getClass().getResource("quizWindow.fxml"));
         // Adds the icon
@@ -22,10 +27,11 @@ public class Main extends Application {
         // Loads the CSS for the FXML
         root.getStylesheets().add("application/lightTheme.css");
         primaryStage.setResizable(false);  // Did this to preserve "nice-lookingness" of the GUI
-        primaryStage.setTitle("Gunvir's FOSS Quiz Game!");
+        primaryStage.setTitle("Gunvir's Quiz Game!");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
+
 
     public static void main(String[] args) {
         launch(args); // Launches a standalone application
