@@ -36,4 +36,6 @@ If you get an alert stating no questions found in the `questions.txt`, make sure
 
 I have compiled a jar and an exe and put them in a release.
 
+The releases page can be found by clicking the releases button near the top of the page.
+
 Feel free to download them along with the questions file and give it a try.
