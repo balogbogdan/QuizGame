@@ -11,7 +11,7 @@
 
 When was Linux invented? ; 1991 ; 2005 ; 1965 ; 1999
 Which one of the following is NOT open source? ; Skype ; Docker ; Python ; PHP ; LibreOffice
-Which does the 'A' stand for in the term LAMP stack? ; Apache ; Ajax ; ActiveX ; ASP.NET
+What does the 'A' stand for in the term LAMP stack? ; Apache ; Ajax ; ActiveX ; ASP.NET
 Firefox was made by what community? ; Mozilla ; Apple ; IBM ; Oracle
 What animal is Tux, the Linux mascot? ; Penguin ; Mouse ; Horse ; Spider
 Which Linux OS is commonly recommended for beginners? ; Ubuntu ; Gentoo ; FreeBSD ; Fedora
