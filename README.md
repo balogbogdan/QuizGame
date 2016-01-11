@@ -31,3 +31,9 @@ If you get an alert stating `questions.txt` is not found, put the questions file
 The file in this repo comes with 10 FOSS (Free and Open Source Software) questions pre-made.
 
 If you get an alert stating no questions found in the `questions.txt`, make sure the file is properly formatted.
+
+#### Release
+
+I have compiled a jar and an exe and put them in a release.
+
+Feel free to download them along with the questions file and give it a try.
