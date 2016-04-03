@@ -8,6 +8,13 @@ This is a simple quiz game built with JavaFX.
 
 Questions are read from an external file `questions.txt` which must be in the same directory as the program.
 
+#### Screenshots
+
+![Screenshot 1](Screenshots/Screenshot_1.png)
+![Screenshot 2](Screenshots/Screenshot_2.png)
+![Screenshot 3](Screenshots/Screenshot_3.png)
+![Screenshot 4](Screenshots/Screenshot_4.png)
+
 #### Adding Questions
 
 Adding more questions is very easy.
