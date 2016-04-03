@@ -130,7 +130,7 @@ public class Question {
         // The correct button is removed so it is easier to set other buttons to wrong answers without checking
         // whether it is the right answer button or not
 
-        // shuffles "wrongs" ArrayList so buttons aren't in predictable order
+        // Shuffles "wrongs" ArrayList so buttons aren't in predictable order
         Collections.shuffle(this.wrongs);
         for (Button b : buttonsCopy) {
             // Sets button to wrong of the same index (not a problem due to the shuffle)

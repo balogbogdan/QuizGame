@@ -78,7 +78,7 @@ public class Controller {
         // Uses getTarget() to get the button that was clicked
         questions.get(Question.getQuestionIndex()).checkCorrect((Button) event.getTarget(), questions, scoreLabel);
 
-        // This ia needed to pause inbetween questions without stopping the UI thread
+        // This is needed to pause inbetween questions without stopping the UI thread
         Timer time = new Timer();
         time.schedule(new TimerTask() {
             @Override
