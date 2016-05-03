@@ -55,7 +55,7 @@ public class Controller {
         Question.setButtons(button1, button2, button3, button4);
 
         // Displays the first question in the GUI
-            questions.get(Question.getQuestionIndex()).displayQuestion(questionLabel, questionNum);
+        questions.get(Question.getQuestionIndex()).displayQuestion(questionLabel, questionNum);
 
         // Event handlers for the buttons calls method
         button1.setOnAction(this::handleButtonAction);

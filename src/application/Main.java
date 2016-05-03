@@ -28,6 +28,10 @@ public class Main extends Application {
         root.getStylesheets().add("application/lightTheme.css");
         primaryStage.setResizable(false);  // Did this to preserve "nice-lookingness" of the GUI
         primaryStage.setTitle("Gunvir's Quiz Game!");
+        primaryStage.setOnCloseRequest((event -> {  // Terminates the scheduled TimerTask to display next question
+            Platform.exit();
+            System.exit(0);
+        }));
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }

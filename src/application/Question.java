@@ -104,9 +104,7 @@ public class Question {
 
     // Takes input of label and buttons and displays the instance question and answers in the GUI
     public void displayQuestion(Label lbl, Label correctLabel) {
-
-        //ArrayList<Button> buttons = new ArrayList<>(Arrays.asList(buttonArray));
-
+        
         ArrayList<Button> buttonsCopy = new ArrayList<>(buttons);
 
 
